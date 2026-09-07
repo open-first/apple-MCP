@@ -1,0 +1,59 @@
+{
+  "name": "apple-mcp",
+  "version": "1.0.0",
+  "description": "Open-source MCP server for Apple Notes, Reminders, and Calendar on macOS. Give Claude (or any MCP client) access to your Apple apps.",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "apple-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "prepare": "npm run build",
+    "test": "node scripts/smoke-test.mjs",
+    "inspector": "npx @modelcontextprotocol/inspector node dist/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "os": [
+    "darwin"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "apple",
+    "macos",
+    "notes",
+    "reminders",
+    "calendar",
+    "claude",
+    "ai",
+    "applescript",
+    "jxa"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-first/apple-MCP.git"
+  },
+  "bugs": {
+    "url": "https://github.com/open-first/apple-MCP/issues"
+  },
+  "homepage": "https://github.com/open-first/apple-MCP#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}
