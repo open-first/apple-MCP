@@ -1,22 +1,32 @@
-# apple-mcp
+<div align="center">
 
-**Talk to Apple Reminders, Notes, and Calendar from Claude — or any AI app that speaks MCP.**
+# 🍎 apple-mcp
 
-apple-mcp is a free, open-source [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server for macOS. Once connected, your AI assistant can do things like:
+**Give your AI assistant hands on your Mac — Apple Notes, Reminders, and Calendar over MCP.**
 
-- *"What's on my calendar this week?"*
-- *"Remind me to call the dentist tomorrow at 9am"*
-- *"Find my note about the trip to Japan and summarize it"*
-- *"Create a note with the meeting summary and add the action items to my Reminders"*
+[![CI](https://github.com/open-first/apple-MCP/actions/workflows/ci.yml/badge.svg)](https://github.com/open-first/apple-MCP/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+![macOS](https://img.shields.io/badge/macOS-only-black?logo=apple)
+![Node 18+](https://img.shields.io/badge/Node-18%2B-brightgreen?logo=node.js&logoColor=white)
 
-It uses macOS's **built-in automation** (Apple events via `osascript`) — no Apple developer account, no API keys, no cloud services, nothing to sign up for. Your data never leaves your Mac except through the AI client you connect it to.
+**No API keys · No cloud · No accounts · 100% local · Free forever**
 
-## Requirements
+</div>
 
-- macOS (any recent version; tested on macOS 15+)
-- [Node.js](https://nodejs.org) 18 or newer (`node --version` to check)
+---
 
-## Install
+Once connected, you just talk:
+
+- 🗓️ *"What's on my calendar this week?"*
+- ✅ *"Remind me to call the dentist tomorrow at 9am"*
+- 📝 *"Find my note about the Japan trip and summarize it"*
+- ✨ *"Save this meeting summary as a note and add the action items to my Reminders"*
+
+apple-mcp is an [MCP](https://modelcontextprotocol.io) server that connects Claude Desktop, Claude Code, or any MCP client to the Apple apps you already use — through macOS's **built-in** automation. Your data never leaves your Mac except through the AI client you choose to connect.
+
+## ⚡ Install in 60 seconds
+
+You need a Mac and [Node.js](https://nodejs.org) 18+ (check with `node --version`).
 
 ```bash
 git clone https://github.com/open-first/apple-MCP.git
@@ -24,81 +34,71 @@ cd apple-MCP
 npm install
 ```
 
-That's it — `npm install` also compiles the server into `dist/`.
+That's the whole install — `npm install` builds the server too.
 
-## Connect to Claude Desktop
+## 🔌 Connect it
 
-1. Open the file `~/Library/Application Support/Claude/claude_desktop_config.json` (create it if it doesn't exist).
-2. Add the server, using the **absolute path** to where you cloned this repo:
+**Claude Desktop** — add this to `~/Library/Application Support/Claude/claude_desktop_config.json` (create the file if it doesn't exist), with the absolute path to your clone:
 
 ```json
 {
   "mcpServers": {
     "apple": {
       "command": "node",
-      "args": ["/Users/YOUR_USERNAME/apple-mcp/dist/index.js"]
+      "args": ["/Users/YOUR_USERNAME/apple-MCP/dist/index.js"]
     }
   }
 }
 ```
 
-3. Restart Claude Desktop. You should see the tools under the 🔌 icon.
+Then quit Claude **fully** (⌘Q — closing the window isn't enough) and reopen it. The tools appear under the 🔌/sliders icon.
 
-## Connect to Claude Code
+**Claude Code** — one command:
 
 ```bash
-claude mcp add apple -- node /Users/YOUR_USERNAME/apple-mcp/dist/index.js
+claude mcp add apple -- node /Users/YOUR_USERNAME/apple-MCP/dist/index.js
 ```
 
-Any other MCP client works the same way: run `node dist/index.js` as a stdio server.
+**Any other MCP client** — it's a standard stdio server: `node dist/index.js`.
 
-## macOS permissions (first run)
+## 🔐 First run: click "Allow"
 
-The **first time** a tool touches each app, macOS shows a prompt like *"Claude would like to control Notes"*. Click **Allow** — once per app.
+The first time a tool touches each app, macOS asks — *"Claude would like to control Notes"*. Click **Allow**, once per app. That's the only setup.
 
-If you accidentally denied it, or nothing happens: open **System Settings → Privacy & Security → Automation**, find the app that runs the server (Claude, Terminal, etc.) and enable the toggles for Notes, Reminders, and Calendar.
+(Denied it by accident? System Settings → Privacy & Security → **Automation** → find Claude → flip the toggles on.)
 
-## Tools
+## 🧰 What it can do
 
-| Tool | What it does |
+12 tools across three apps:
+
+| 📝 Notes | ✅ Reminders | 📅 Calendar |
+|---|---|---|
+| Search notes | List / search reminders | List events by date range |
+| Read a full note | Create with due date + notes | Search events |
+| Create a note | Mark complete | Create events (location, notes, all-day) |
+| List folders | Delete | List calendars |
+
+Read tools are marked **read-only** and delete is marked **destructive**, so well-behaved MCP clients ask you before anything risky happens.
+
+## 🩹 Troubleshooting
+
+| Symptom | Fix |
 |---|---|
-| `notes_folders` | List Notes folders across all accounts |
-| `notes_search` | Search notes by text, or list recent notes |
-| `notes_get` | Read a full note (text or HTML) |
-| `notes_create` | Create a note (optionally in a folder) |
-| `reminders_lists` | List reminder lists |
-| `reminders_list` | List/search reminders (filter by list, completed, text) |
-| `reminders_create` | Create a reminder with notes + due date |
-| `reminders_complete` | Mark a reminder done |
-| `reminders_delete` | Delete a reminder (permanent — the assistant is told to prefer completing) |
-| `calendar_calendars` | List calendars |
-| `calendar_events` | List/search events in a date range |
-| `calendar_create_event` | Create an event (title, time, location, notes, all-day) |
+| "macOS blocked automation access" | Grant the permission (see above), retry |
+| A call hangs or times out | A permission prompt is probably waiting on your screen. Huge libraries can also be slow — narrow by folder, list, calendar, or date range |
+| Repeating events show only their first date | Apple scripting limitation; a native fix is on the [roadmap](ROADMAP.md) |
+| Want to test without an AI client | `npm run inspector` opens a web UI to call every tool by hand |
 
-All read tools are marked read-only and the delete tool is marked destructive, so well-behaved MCP clients ask before doing anything risky.
+## 🛠️ Add more Apple apps
 
-## Troubleshooting
+Every app is **one file** in [`src/modules/`](src/modules) — small automation scripts plus tool definitions, usually under 150 lines. User input is passed as JSON data, never pasted into script code, so there's no injection risk.
 
-**"macOS blocked automation access"** — grant the permission (see above), then retry.
+Mail, Messages, and Contacts are next on the [roadmap](ROADMAP.md) — and [CONTRIBUTING.md](CONTRIBUTING.md) shows exactly how to add one. PRs welcome!
 
-**A call times out** — check your Mac's screen: a permission prompt is probably waiting. Also, very large libraries (thousands of notes/events) can be slow through Apple's scripting interface; narrow the search with a folder, list, calendar, or date range.
+## 💬 Why this exists
 
-**Repeating calendar events show only their original date** — a limitation of Apple's scripting interface; individual occurrences aren't expanded. A native EventKit backend that fixes this is on the [roadmap](ROADMAP.md).
+A Reddit comment asked for one app connecting Apple Reminders, Notes, and Calendar to AI: *"It's crazy that Apple hasn't done this yet."* Apple still hasn't. So here it is — free, for everyone.
 
-**Test everything without an AI client:**
+## 📄 License
 
-```bash
-npm run inspector
-```
-
-opens the MCP Inspector, a web UI where you can call each tool by hand.
-
-## How it works / adding more Apple apps
-
-Each Apple app is one file in [`src/modules/`](src/modules) — a set of small JXA (JavaScript for Automation) scripts plus MCP tool definitions. The server passes user input to the scripts as JSON arguments (never by pasting it into script code, so there's no injection risk) and returns JSON back.
-
-Want Mail, Messages, or Contacts? See [CONTRIBUTING.md](CONTRIBUTING.md) — a new app is typically under 150 lines, and the [ROADMAP.md](ROADMAP.md) lists what's planned.
-
-## License
-
-[MIT](LICENSE) — free forever, for everyone.
+[MIT](LICENSE) — do whatever you want with it.
